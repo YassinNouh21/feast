@@ -571,13 +571,8 @@ main::before {
 
 .integration-item {
     display: flex;
-    align-items: center;
     justify-content: center;
-    height: 40px;
-    text-align: center;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 140px;
+    align-items: center;
 }
 
 .integration-logo {
@@ -622,13 +617,21 @@ main::before {
 }
 
 .integration-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 24px 20px;
     margin: 0 auto;
     justify-content: center;
     width: 100%;
     max-width: 900px;
+}
+
+.integration-item {
+    flex: 0 0 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
 }
 
 /* Code section */
