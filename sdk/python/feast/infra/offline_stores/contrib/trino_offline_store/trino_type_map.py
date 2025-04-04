@@ -66,8 +66,8 @@ def pa_to_trino_value_type(pa_type_as_str: str) -> str:
 _TRINO_TO_PA_TYPE_MAP = {
     "null": pa.null(),
     "boolean": pa.bool_(),
-    "date": pa.date32(),
     "tinyint": pa.int8(),
+    "date": pa.date32(),
     "smallint": pa.int16(),
     "integer": pa.int32(),
     "bigint": pa.int64(),
