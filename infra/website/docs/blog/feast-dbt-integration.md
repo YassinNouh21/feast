@@ -155,18 +155,17 @@ This creates `target/manifest.json` with all your model metadata—the same arti
 Use the Feast CLI to discover your tagged models:
 
 ```bash
-feast dbt list target/manifest.json --tag-filter feast
+feast dbt list -m target/manifest.json --tag feast
 ```
 
 You'll see output like:
 
 ```
-Found 1 model(s) with tag 'feast':
+Found 1 model(s):
 
-  driver_features
-    Description: Daily aggregated features for drivers including ratings and activity metrics
-    Columns: driver_id, event_timestamp, avg_rating, total_trips, total_earnings, avg_trip_duration, is_active
-    Tags: feast
+driver_features [tags: feast]
+  Table: my_project.my_dataset.driver_features
+  Description: Daily aggregated features for drivers including ratings and activity metrics
 ```
 
 ### Step 6: Import Your dbt Model to Feast
@@ -174,10 +173,10 @@ Found 1 model(s) with tag 'feast':
 Now for the magic—automatically generate production-ready feature definitions from your dbt model:
 
 ```bash
-feast dbt import target/manifest.json \
+feast dbt import -m target/manifest.json \
     --entity-column driver_id \
     --data-source-type bigquery \
-    --tag-filter feast \
+    --tag feast \
     --output feature_repo/driver_features.py
 ```
 
@@ -265,10 +264,10 @@ And here's the best part: when you update your dbt model (maybe you add a new co
 For features involving multiple entities (like user-merchant transactions), specify multiple entity columns:
 
 ```bash
-feast dbt import target/manifest.json \
+feast dbt import -m target/manifest.json \
     -e user_id \
     -e merchant_id \
-    --tag-filter feast \
+    --tag feast \
     -o feature_repo/transaction_features.py
 ```
 
@@ -283,7 +282,7 @@ Feast's dbt integration supports multiple data warehouse backends:
 
 **Snowflake:**
 ```bash
-feast dbt import manifest.json \
+feast dbt import -m manifest.json \
     -e user_id \
     -d snowflake \
     -o features.py
@@ -291,7 +290,7 @@ feast dbt import manifest.json \
 
 **File-based sources (Parquet, etc.):**
 ```bash
-feast dbt import manifest.json \
+feast dbt import -m manifest.json \
     -e user_id \
     -d file \
     -o features.py
@@ -302,13 +301,12 @@ feast dbt import manifest.json \
 You can fine-tune the import with additional options:
 
 ```bash
-feast dbt import target/manifest.json \
+feast dbt import -m target/manifest.json \
     -e driver_id \
     -d bigquery \
     --timestamp-field created_at \
     --ttl-days 7 \
     --exclude-columns internal_id,temp_field \
-    --no-online \
     -o features.py
 ```
 
@@ -347,12 +345,12 @@ jobs:
   update-features:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
+      - uses: actions/checkout@v4
+
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
       
       - name: Install dependencies
         run: |
@@ -366,10 +364,10 @@ jobs:
       
       - name: Generate Feast definitions
         run: |
-          feast dbt import dbt_project/target/manifest.json \
+          feast dbt import -m dbt_project/target/manifest.json \
             -e user_id \
             -d bigquery \
-            -t feast \
+            --tag feast \
             -o feature_repo/features.py
       
       - name: Apply to feature store
@@ -383,7 +381,7 @@ jobs:
 Before generating code, preview what will be created:
 
 ```bash
-feast dbt import manifest.json -e driver_id --dry-run
+feast dbt import -m manifest.json -e driver_id --dry-run
 ```
 
 This helps catch issues like missing columns or incorrect types before committing.
@@ -447,7 +445,7 @@ Ready to see your dbt models in production? Install Feast and try it out:
 pip install 'feast[dbt]'
 cd your_dbt_project
 dbt compile
-feast dbt import target/manifest.json -e your_entity_column -d bigquery
+feast dbt import -m target/manifest.json -e your_entity_column -d bigquery
 ```
 
 Your models are already great. Now make them do more.
